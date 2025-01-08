@@ -29,7 +29,7 @@ class NeuralNetwork:
         outputs = [np.zeros(s) for s in self._sizes]
         outputs[0] = input
         for i in range(len(outputs) - 1):
-            outputs[i + 1] = sigmoid(self.weights[i] @ outputs[i] + self.biases[i])
+            outputs[i + 1] = [] # Fill here
 
         return outputs
     
@@ -47,13 +47,11 @@ class NeuralNetwork:
         outputs = self.eval(input)
         der_sigmoid = [(1 - o) * o for o in outputs]
 
-        delta = [np.random.randn(self._sizes[i], self._sizes[i - 1]) for i in range(1, len(self._sizes))]
-
-        deltas = [outputs[-1] - y] 
+        deltas = [outputs[-1] - y] # Derivatives of the cost function
         
         for i in reversed(range(len(self.weights) - 1)):
-            delta = self.weights[i + 1].T @ deltas[-1] * der_sigmoid[i + 1]
-            deltas.append(delta)
+            delta = [] # Update for each layer 
+            deltas.append(delta) 
 
         deltas.reverse()
 
@@ -61,8 +59,8 @@ class NeuralNetwork:
         der_biases = []
 
         for i in range(len(self.weights)):
-            der_weights.append(np.outer(deltas[i], outputs[i].T))
-            der_biases.append(np.sum(deltas[i], axis=0, keepdims=True))
+            der_weights.append([]) # derivatives for the weights
+            der_biases.append([]) # derivatives for the biases
 
         return der_weights, der_biases
     
@@ -132,39 +130,66 @@ class NeuralNetwork:
         Y_true = np.zeros(len(Y))
         
         for i, x in enumerate(X): 
-            Y_candidate[i] = np.argmax(self.eval(x)[-1])
-            Y_true[i] = np.argmax(Y[i])
+            Y_candidate[i] = [] # Obtain predicted class
+            Y_true[i] = [] # Obtain real class
 
         return Y_true, Y_candidate
 
 
 class SupportVectorMachine:
-    def __init__(self, feature_map = None):
+    def __init__(self, feature_map = None, kernel = None):
         self.weights = None
         self.biases = None
         if feature_map is None: 
             self.feature_map = lambda x: x
+        else: 
+            self.feature_map = feature_map
+            
+        if kernel is None: 
+            self.kernel = lambda x, y: x @ y
+        else: 
+            self.kernel = kernel
+            
+        
+            
+    def cost(self, X, y, lambda_param = 1):
+        cost = 
+        
+        cost = np.mean(cost)
+        
+        return cost
+        
     
     def fit(self, X, y, epochs = int(1e4), learning_rate = 0.01, lambda_param = 1):
         X = self.feature_map(X)
         n_samples, n_features = X.shape
-        y = np.where(y <= 0, -1, 1)  # Convert labels to -1 and 1
 
-        self.w = np.zeros(n_features)
-        self.b = 0
+        self.weights = np.random.randn(n_features)
+        self.bias = 0
 
+        c = self.cost(X, y)
+        
+        costs = []
+        
         for epoch in range(epochs):
-            for idx, x_i in enumerate(X):
-                condition = y[idx] * (np.dot(x_i, self.w) + self.b) >= 1
-                if condition:
-                    # Gradient for correctly classified point
-                    self.w -= learning_rate * (2 * lambda_param * self.w)
-                else:
-                    # Gradient for misclassified point
-                    self.w -= learning_rate * (2 * lambda_param * self.w - np.dot(x_i, y[idx]))
-                    self.b -= learning_rate * y[idx]
+            condition = 
+            der_weights = 
+            der_bias = 
+        
+            self.weights -= learning_rate * der_weights
+            self.bias -= learning_rate * der_bias
+            
+            c_ = self.cost(X, y)
+            
+            if np.abs(c - c_) < 1e-5: 
+                break
+            else: 
+                c = c_
+                costs.append(c)
 
-    def predict(self, X):
+        return costs
+            
+    def predict(self, X, rounding = False):
         """
         Predict the class labels for the input data.
 
@@ -175,5 +200,55 @@ class SupportVectorMachine:
         - Predicted class labels, shape (n_samples,).
         """
         X = self.feature_map(X)
-        approx = np.dot(X, self.w) + self.b
-        return np.sign(approx)
+        approx = 
+        if rounding: return np.sign(approx)
+        else: return approx
+        
+        
+class SupportVectorMachineDual:
+    def __init__(self, kernel = None):
+        self.alpha = None
+            
+        if kernel is None: 
+            self.kernel = lambda x, y: x @ y
+        else: 
+            self.kernel = kernel
+            
+    def compute_kernel(self, X, y):
+        K = np.zeros((len(X), len(X)))
+        for i, (xi, yi) in enumerate(zip(X, y)):
+            for j, (xj, yj) in enumerate(zip(X, y)):
+                K[i, j] = 
+                
+        return K
+           
+    def fit(self, X, y, lambda_param = 1):
+        K = self.compute_kernel(X, y)
+        n_samples = len(X)
+        solvers.options['show_progress'] = False
+        
+        # Fill the matrices for a quadratic optimization, see https://cvxopt.org/userguide/coneprog.html?highlight=cvxopt%20solvers%20qp#cvxopt.solvers.qp
+        
+        P = 
+        q = 
+        G = 
+        h = 
+        A = 
+        b = 
+        
+        solvers.options['show_progress'] = False
+        solution = solvers.qp(P, q, G, h, A, b)
+        self.alpha = np.ravel(solution['x'])
+        
+    
+    def predict(self, X_train, X, rounding=False):
+        K = np.zeros((len(X), len(X_train)))
+        for i, xi in enumerate(X_train):
+            for j, xj in enumerate(X): 
+                K[j, i] = 
+        
+        approx = 
+        
+                
+        if rounding: return np.sign(approx)
+        else: return approx
