@@ -6,7 +6,7 @@ from qibo import Circuit, gates
 import os
 
 import numpy as np
-from datasets import create_dataset, create_target, fig_template, world_map_template
+from datasets_solutions import create_dataset, create_target, fig_template, world_map_template
 from matplotlib.cm import get_cmap
 from matplotlib.colors import Normalize
 
@@ -18,7 +18,7 @@ class QuantumClassifer:
         Class for a multi-task variational quantum classifier
 
         Args:
-            nclasses: int number of classes to be classified
+            nclases: int number of classes to be classified
             nqubits: int number of qubits employed in the quantum circuit
         """
         self.nclasses = nclasses
@@ -31,14 +31,14 @@ class QuantumClassifer:
         if RY:
 
             def rotations():
-                for q in range(self.nqubits): #rotations only around Y
-                    yield fill 
+                for q in range(self.nqubits):
+                    yield gates.RY(q, theta=0)
 
         else:
 
             def rotations():
-                for q in range(self.nqubits): #Rotations around 3 axis
-                    yield fill 
+                for q in range(self.nqubits):
+                    yield gates.RX(q, theta=0)
                     yield gates.RZ(q, theta=0)
                     yield gates.RX(q, theta=0)
 
@@ -47,14 +47,14 @@ class QuantumClassifer:
     def _CZ_gates1(self):
         """Yields CZ gates used in the variational circuit."""
         for q in range(0, self.nqubits - 1, 2):
-            yield fill
+            yield gates.CZ(q, q + 1)
 
     def _CZ_gates2(self):
         """Yields CZ gates used in the variational circuit."""
         for q in range(1, self.nqubits - 1, 2):
-            yield fill
+            yield gates.CZ(q, q + 1)
 
-        yield fill
+        yield gates.CZ(0, self.nqubits - 1)
 
     def ansatz(self, nlayers, rotations):
         """
@@ -66,10 +66,13 @@ class QuantumClassifer:
             Circuit implementing the variational ansatz
         """
         c = Circuit(self.nqubits)
-        for _ in range(nlayers): # Create ansatz
-            c.add(fill)
+        for _ in range(nlayers):
+            c.add(rotations())
+            c.add(self._CZ_gates1())
+            c.add(rotations())
+            c.add(self._CZ_gates2())
         # Final rotations
-        c.add(fill)
+        c.add(rotations())
         # Measurements
         c.add(gates.M(*range(self.measured_qubits)))
 
@@ -109,9 +112,9 @@ class QuantumClassifer:
         prediction = np.zeros(self.measured_qubits)
 
         for qubit in range(self.measured_qubits):
-            for clas in range(self.nclasses):
-                binary = bin(clas)[2:].zfill(self.measured_qubits)
-                prediction[qubit] += fill # add classes result[clas] * (1 - 2 * int(binary[-qubit - 1]))
+            for clase in range(self.nclasses):
+                binary = bin(clase)[2:].zfill(self.measured_qubits)
+                prediction[qubit] += result[clase] * (1 - 2 * int(binary[-qubit - 1]))
 
         return prediction / nshots + bias
 
@@ -249,8 +252,9 @@ class single_qubit_classifier:
     def _initialize_circuit(self):
         """Creates variational circuit."""
         C = Circuit(1)
-        for l in range(self.layers): # add rotations
-            C.add(fill)
+        for l in range(self.layers):
+            C.add(gates.RY(0, theta=0))
+            C.add(gates.RZ(0, theta=0))
         return C
 
     def circuit(self, x):
@@ -264,8 +268,8 @@ class single_qubit_classifier:
         """
         params = []
         for i in range(0, 4 * self.layers, 4):
-            params.append(fill, x[0]) # weights x + bias (twice)
-            params.append(fill, x[1])
+            params.append(self.params[i] * x[0] + self.params[i + 1])
+            params.append(self.params[i + 2] * x[1] + self.params[i + 3])
         self._circuit.set_parameters(params)
         return self._circuit
 

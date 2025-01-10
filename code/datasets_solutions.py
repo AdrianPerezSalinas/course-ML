@@ -42,11 +42,27 @@ def create_target(name):
         List of numpy arrays encoding target states that depend only on the number of classes of the given problem
     """
     if name in ["circle", "square", "crown"]: # 2 points in the Block sphere, maximally distant
-        targets = [fill1, fill2]  
+        targets = [np.array([1, 0], dtype="complex"), np.array([0, 1], dtype="complex")]  
     elif name in ["tricrown"]: # 3 points in the Block sphere, maximally distant
-        targets = [fill1, fill2, fill3]
+        targets = [
+            np.array([1, 0], dtype="complex"),
+            np.array([np.cos(np.pi / 3), np.sin(np.pi / 3)], dtype="complex"),
+            np.array([np.cos(np.pi / 3), -np.sin(np.pi / 3)], dtype="complex"),
+        ]
     elif name in ["4_squares", "wavy_lines", "3_circles"]: # 4 points in the Block sphere, maximally distant
-        targets = [fill1, fill2, fill3, fill4]
+        targets = [
+            np.array([1, 0], dtype=complex),
+            np.array([1 / np.sqrt(3), np.sqrt(2 / 3)], dtype=complex),
+            np.array(
+                [1 / np.sqrt(3), np.exp(1j * 2 * np.pi / 3) * np.sqrt(2 / 3)],
+                dtype=complex,
+            ),
+            np.array(
+                [1 / np.sqrt(3), np.exp(-1j * 2 * np.pi / 3) * np.sqrt(2 / 3)],
+                dtype=complex,
+            ),
+        ]
+
     else:
         raise NotImplementedError("This dataset is not implemented")
 
