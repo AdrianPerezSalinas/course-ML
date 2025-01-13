@@ -40,7 +40,7 @@ We can begin by describing what is machine learning from a technical perspective
 
 \paragraph{Data}
 
-    In machine learning models, data is given by the pairs $(x, y)$, where $x$ will be the data input into the model, and $y$ will be output from the model. This data will be generically referred to as $\mathcal D = \mathcal X \times \mathcal Y$. The structure of the data in principle contains all information required to solve a particular problem. The goal of a machine learning algorithm is to infer from data the implicit function $f : \mathcal X \rightarrow \mathcal Y$, with the aim that we can predict the effect of this function on previously unseen data. 
+    In machine learning models, data is given by the pairs $(x, y)$, where $x$ will be the data input into the model, and $y$ will be output from the model. In certain cases, this data is truncated to only $x$. This data will be generically referred to as $\mathcal D = \mathcal X \times \mathcal Y$. The structure of the data \textit{in principle} contains all information required to solve a particular problem. The goal of a machine learning algorithm is to infer from data the implicit function $f : \mathcal X \rightarrow \mathcal Y$, with the aim that we can predict the effect of this function on previously unseen data. 
 
     Data can be divided in several types of data, for instance training set, test set or validation set. Before delving into the differences of these kinds of data it is important to highlight some particularities of the framework. The data points $\mathcal D$ conform a distribution of points $(x,y)$ which is in many cases continuous. In other words, one cannot access to all data available in $\mathcal D$, but only sample from it. This gives rise to the concept of training/test data. 
 
@@ -48,7 +48,7 @@ We can begin by describing what is machine learning from a technical perspective
 
     \textit{Test data} is another discrete subset $\mathcal C$ of the same form as $\mathcal T$, that is not used to train the machine learning model. However, the success of the model depends on the performance over $\mathcal C$. Would the model perform accurately on $\mathcal C$, the model is considered successful. In this scenario, the model will have \textit{learnt} the data, as opposed to \textit{memorizing} it. Hence, the model is capable of generalizing the acquired knowledge. 
 
-    There exists also the \textit{validation set} $\mathcal V$, as a third dataset serving as a touchstone of machine learning model. The $\mathcal V$ is used to adjust the outcomes of a machine learning model after training. This step is not always necessary. 
+    There exists also the \textit{validation set} $\mathcal V$, as a third dataset serving as a touchstone of machine learning model. The $\mathcal V$ is used to adjust the outcomes of a machine learning model after training. This step is not always necessary or used, but it is very common. 
 
 \paragraph{Training} A fundamental step of all machine learning algorithms is the optimization of the parameters, or training the model. To perform training, one needs a) a training dataset and b) a training algorithm. The goal of the training is to minimize some cost function that quantifies how accurately is the algorithm predicting the outcomes of a data set. 
 
@@ -56,14 +56,13 @@ The first ingredient is the loss function $\mathcal L(\theta)$, which can be com
 \begin{equation}
     \mathcal L_{\mathcal D}(\theta), \qquad \mathcal L_{\mathcal T}(\theta), \qquad \mathcal L_{\mathcal C}(\theta)
 \end{equation}
-It is possible to compute $\mathcal L_{\mathcal T}(\theta), \mathcal L_{\mathcal C}(\theta)$, but $\mathcal L_{\mathcal D}(\theta)$ is not computable, since the dataset $\mathcal D$ is not accessible. A common example for the loss function is given by the mean squared error
+It is possible to compute $\mathcal L_{\mathcal T}(\theta), \mathcal L_{\mathcal C}(\theta)$, but $\mathcal L_{\mathcal D}(\theta)$ is not computable, since the dataset $\mathcal D$ is not accessible. In a nutshell, the only available information over $\mathcal D$ is obtained by sampling. Hence, only Monte-Carlo-like approximations can be computed. 
+
+A common example for the loss function is given by the mean squared error
 \begin{equation}
     \mathcal L_{\mathcal T}(\theta) = \frac{1}{\vert \mathcal T \vert} \sum_{x \in \mathcal T} (y(x) - f_\theta(x))^2, 
 \end{equation}
-although one can use of many other distance functions. The training process minimizes $\mathcal L_{\mathcal T}(\theta)$ with the hope to minimize $\mathcal L_{\mathcal D}(\theta)$ as well. The difference between these two quantities is usually called the generalization error, 
-\begin{equation}
-    \mathcal G(\theta) = \left\vert \mathcal L_{\mathcal D}(\theta) - \mathcal L_{\mathcal T}(\theta) \right\vert
-\end{equation}
+although one can use of many other distance functions, with different performances for specific problems. The training process minimizes $\mathcal L_{\mathcal T}(\theta)$ with the hope to minimize $\mathcal L_{\mathcal D}(\theta)$ as well. 
 
 The second relevant ingredient is the optimization algorithm. Optimizing multidimensional functions is, in general, a very hard problem. It can be proven that it belongs to the class of NP-hard problems, hence finding the optimal solution is not a feasible scenario. However, some machine learning algorithms have specific optimization algorithms that enhance their applicability. This is not enough to find the optimal solution, but it provides \textit{good} solutions, that is, instances that \textit{approximately} solve the problem. 
 The optimization problem is formulated as finding
@@ -82,6 +81,14 @@ There exist a plethora of algorithms to solve optimization problem, and in gener
 
 In particular, neural networks admit the use of \textit{backpropagation} as an optimization algorithm. This enables using neural network as a learning method, and lies at the core of machine learning as a product for industrial purposes. Backpropagation will be covered in depth within the scope of this course. 
   
+A third relevant ingredient is the generalization. As previously mentioned, the optimization of a machine learning algorithm can only learn the training data. The hope is that this learning is enough to learn also the test or validation data. An interpretation is that the model can actually \textit{learn} the internal properties and structure of the data, instead of just \textit{memorizing} the training data, and not being capable of inferring any information from previously unseen data. The difference between these two quantities is usually called the generalization error, 
+\begin{equation}
+    \mathcal G(\theta) = \left\vert \mathcal L_{\mathcal D}(\theta) - \mathcal L_{\mathcal T}(\theta) \right\vert,
+\end{equation}
+usually studied through generalization bounds \cite{wolf2023mathematical}. 
+
+This topic will not be covered in these lectures, hence it is relevant to give some information about it. Generalization bounds capture the complexity of the model, that is, how many choices the training discards. As a consequence, it is possible to know how many training data is needed to narrow the outcomes of the learning algorithm. Intuitively, if the model is too sophisticated, it can learn any kind of data, but also there exist many possible outcomes that correspond to the same data. The training is not capable of knowing which of the outcomes is optimal for unseen data. Hence, the model generalizes poorly. In this case, the model is said to \textit{overfit} the training data.
+
 \section{Types of machine learning}\label{sec.types}
 
 There exist several different types of machine learning algorithm, depending on the input and output of the problem at hand, and the objective of the learning procedure. In this section, we will give a brief description of the most relevant ones, with the goal of providing a comprehensive but not exhaustive overview of the field. 
@@ -121,22 +128,23 @@ where each $\theta$ is the label corresponding to each hypothesis function. The 
 \mathcal H_{\rm sin} = \left\{ \sin(x + \theta)\right\}_\theta.
 \end{equation}
 A machine learning algorithm capable of representing this hypothesis family will be capable of learning sinoidal functions, but will struggle with data that does not correspond to this particular functional form. 
+\begin{wrapfigure}{R}{.5\linewidth}
+\centering
+\includegraphics[width = \linewidth]{images/overfitting}
+\caption{Overfitting in regression models for machine learning. The overfitted function can reach zero training error on the training data. However, its behavior between these points is unpredictable, yielding to large errors in test data. On the other hand, a fitted function may learn training data only approximately, with the advantage of yielding good approximations for test data. There is no \textit{a priori} manner to know if a model is overfitting, one can only assess that property through testing.}
+\end{wrapfigure}
 
 One could agree that machine learning for regression is nothing but statistical regression with a extra steps. Consider for instance the hypothesis family given by
 \begin{equation}
 \mathcal H_{{\rm poly}, N} = \left\{ \sum_{n = 0}^N a_n x^n \right\}, 
 \end{equation}
-for $x \in \mathbb R$. For this hypothesis family, it is possible to use $N$ data points to find the optimal configuration of $\{ a_n\}$ to fit the data. Alternatively, one can use $M \gg N$ data points and statistical regression procedures to obtain the configuration minimizing the errors. 
+for $x \in \mathbb R$. For this hypothesis family, it is possible to use $N$ data points to find the optimal configuration of $\{ a_n\}$ to fit the data. Alternatively, one can use $M \gg N$ data points and statistical regression procedures to obtain the configuration minimizing the errors. This model would be capable of representing any polynomial up to degree $d$. Since all analytical functions admit a representation in polynomials by virtue of Taylor's expansion, polynomial regression suffices in principle to approximate any function (within the limits of Taylor's theorem). However, many terms would be needed to approximate functions with slowly vanishing terms. 
 
 While the previous paragraph is always available, it clashes with the spirit of machine learning. Regression techniques as the one explained before requires an \textit{a priori} knowledge of the problem to be solved, sometimes dubbed as an ansatz. Machine learning, and in particular deep learning (to be discussed in \Cref{sec.neural-networks}), generates large hypothesis families with no immediate constructions of their functional forms to automatically look for an optimal solution. 
 
+
 Regression tasks allow for an immediate interpretation of \textit{overfitting}, a common name for generalization error, see \Cref{ch.introduction}. Machine learning algorithms look for an optimal configuration of its internal degrees of freedom with respect to a training data, and it \textit{hopes} for good performance also in test data. The relevant figure of merit is the accuracy with respect to the unseen data, to ensure \textit{learning} of the internal structure of the data, rather than \textit{memorizing}. Overfitting can be usually prevented by limiting the change rate of the hypothesis functions, usually through regularization cost functions. 
 
-\begin{figure}
-\centering
-\includegraphics[width = .5\linewidth]{images/overfitting}
-\caption{Overfitting in regression models for machine learning. The overfitted function can reach zero training error on the training data. However, its behavior between these points is unpredictable, yielding to large errors in test data. On the other hand, a fitted function may learn training data only approximately, with the advantage of yielding good approximations for test data. There is no \textit{a priori} manner to know if a model is overfitting, one can only assess that property through testing.}
-\end{figure}
 
 \subsection{Supervised classification}\label{sec.classification}
 
@@ -148,9 +156,16 @@ y: \mathbb R^nm \rightarrow \mathbb Z.
 \end{equation}
 One can map the data functions from regression $(y_r)$ to classification $(y_c)$ as follows. Consider the image of $y_r$ being $\mathbb R$. Then, an integer rounding of the output would be enough to perform classification. Alternatively, if the image is $[0, 1]^C \in \mathbb R^C$, the classification can be performed by considering $y_r$ as a step function, doable by rounding functions. 
 
-The paradigmatic example of supervised classification are support vector machines (SVM) (see \Cref{sec.support-vector-machines}). In this method, data points are classified with respect to a hyperplane dividing the data space in two pieces. To this end, the concept of \textit{kernel} arises. A kernel is a function $\phi$ embedding data $x$ into a feature space where the classification is performed. In general, choosing the right kernel $\phi$ is crucial to the performance of the algorith. This acquires special relevance in quantum machine learning, where the first quantum advantages were found for quantum SVMs for well chosen embedding kernels \cite{liu2021rigorous}.
+The paradigmatic example of supervised classification are support vector machines (SVM) (see \Cref{sec.support-vector-machines}). In this method, data points are classified with respect to a hyperplane dividing the data space in two pieces. To this end, the concept of \textit{kernel} arises. A kernel is a function $\phi$ embedding data $x$ into a feature space where the classification is performed. In a nutshell, it is possible to perform classification by just computing inner products between data points (in the feature space), rather than embedding this data into the space. In general, choosing the right kernel $\phi$ is crucial to the performance of the algorith. This acquires special relevance in quantum machine learning, where the first quantum advantages were found for quantum SVMs for well chosen embedding kernels \cite{liu2021rigorous}.
 
 In the references to binary classifications for SVMs, we will only focus on binary classification, as it is usually done in machine learning references. The reason is that it is possible to to combine binary classifiers to create a classifier for larger number of classes $C$. A possible approach is to create a binary classifier for distinguishing $C = 0$ and $C \neq 0$. Then, a second classifier is applied to the data labeled as $C \neq 0$ to classify this data as $C = 1$ or $C \neq 1$. This procedure can be repeated until the end of classes. Another approach is to utilize several classifiers to distinguish $C = i$ or $C \neq i$, for all $i = \{0, 1,\ldots C - 1\}$\footnote{In the notes, I will start the indexing in $0$, to keep consistency with the code in \texttt{Python}.}, and crosscheck the outputs. 
+
+\begin{figure}
+\centering
+\includegraphics[width = .8\linewidth]{images/cluster_datasets}
+\caption{Example of data and proposed solutions by different algorithms for a supervised learning problem \cite{pedregosa2011scikitlearn}. The data does not provide any information on how go distinguish between classes or even how many classes one should consider. Thus, this information has to be input into the algorithm by the user, yielding different results. }
+\label{fig.unsupervised-learning}
+\end{figure}
 
 \subsection{Unsupervised classification}\label{sec.unsupervised-classification}
 
@@ -158,12 +173,7 @@ Unsupervised classification, also known as clustering, is the learning algorithm
 
 Consider the example here given in \Cref{fig.unsupervised-learning}. Visually, it is obvious that data can be divided in two classes. If the two \textit{moons} are located one distant away from the other, a SVM together with euclidan distance should suffice to provide an accurate discrimination. In contrast, if the \textit{moons} are located close to each other, it would be necessary to introduce a appropriate data embedding to ensure linear classification. 
 
-\begin{figure}
-\centering
-\includegraphics[width = .7\linewidth]{images/cluster_datasets}
-\caption{Example of data and proposed solutions by different algorithms for a supervised learning problem \cite{pedregosa2011scikitlearn}. The data does not provide any information on how go distinguish between classes or even how many classes one should consider. Thus, this information has to be input into the algorithm by the user, yielding different results. }
-\label{fig.unsupervised-learning}
-\end{figure}
+
 
 Unsupervised learning will not be exhaustively covered in these notes. However, good references can be found in \cite{pedregosa2011scikitlearn}.
 
@@ -181,7 +191,7 @@ The random variable $x$ is intended to be indistinguishable (or at least close e
 \begin{align}
 x_t & \sim \mathcal D_T \\
 x_t & \sim \mathcal D_{\mathcal A} \\
-\mathcal D_T \approx \mathcal D_{\mathcal A}.
+\mathcal D_T & \approx \mathcal D_{\mathcal A}.
 \end{align}
 Hence the task is to approximate $\mathcal D_{\mathcal A}$ as much as possible to $\mathcal D_T$. 
 
@@ -210,15 +220,14 @@ In spite of all the formal and theoretical problems that arise in generative mod
 \subsection{Reinforcement learning}
 
 In reinforcement learning, a machine learning algorithm is trained to interact with some environment and obtain some reward from it. At each step, the machine or \textit{agent} can perform one \textit{action} on the environment. The internal states of the agent and the environment may change. The action will return some \textit{reward} on the agent, awarded by the \textit{interpreter}, which can be constructed from data. The goal of the agent is to perform the sequence of actions that maximizes the obtained reward from an environment. 
+\begin{wrapfigure}{R}{\linewidth}
+\includegraphics[width = \linewidth]{images/reinforcement-learning}
+\caption{Scheme for reinforcement learning}
+\label{fig.reinforcement-learning}
+\end{wrapfigure}
 
 As an example, consider playing chess. The machine is initially equipped with the basic moves of the pieces. The agent is one player, and the environment is the opponent. The interpreter is composed by large data samples on previous matches played by humans. The machine moves one piece (takes one action) and the environment responds with another move. The position of the board can be compared to a stored database to estimate the probability of each player to win. Over time, the machine learns to play chess intelligently, by just imitating those moves that maximize the winning probability. 
 
-\begin{figure}
-\includegraphics[width = .7\linewidth]{images/reinforcement-learning}
-\caption{Scheme for reinforcement learning}
-\label{fig.reinforcement-learning}
-
-\end{figure}
 
 \chapter{Regression and supervised classification}
 
@@ -247,7 +256,7 @@ For the output functions, the procedure is repeated, yielding
 \begin{equation}
 f(x) = \sigma_o(W_o \sigma(W_h x + b_h) + b_o).
 \end{equation}
-This single-layer neural network suffices to provide an extremely rich hypothesis family, in fact \textit{universal}, that is capable of representing any function. This is supported by the universal approximation theorem, see \Cref{sec.universality}. 
+This single-layer neural network suffices to provide an extremely rich hypothesis family, in fact \textit{universal}, that is capable of representing any function. This is supported by the universal approximation theorem, see \Cref{sec.universality-nn}. 
 
 \begin{figure}
 \centering
@@ -263,13 +272,7 @@ f(x) = \sigma_L(b_L + W_L \sigma(b_{L-1} + W_{L - 1} \sigma(b_{L-2} + W_{L - 2} 
 \end{equation}
 The definition of the NN creates an easy to evaluate and represent function with properties that are hard to characterize from an analytical point of view. Hence, the use of computational tools is a crucial element to study neural networks. 
 
-\begin{figure}
-
-\caption{Multi layer neural network.}
-\label{fig.multi-layer-neural-network}
-\end{figure}
-
-\subsection{Universality of neural networks}
+\subsection{Universality of neural networks}\label{sec.universality-nn}
 
 \paragraph{Universal approximation theorem (UAT) \cite{cybenko1989approximation} --}Consider a NN where $\sigma_o(\cdot)$ is the identity function, and $n = 1$. Consider the activation function $\sigma_h(\cdot)$ to be any continuous sigmoidal function, that is 
 \begin{align}
@@ -314,7 +317,7 @@ f_h(x) = \sum_{i = 1}^h c_{i} \cos(w_i \cdot x) + s_{i} \sin(w_i \cdot x).
 \end{equation}
 The elements that construct this approximation have tunable weights. Each of these elements, for $w_i \in \mathbb R^m$ has a non-zero overlap with the basis elements $\sin(n \cdot x), \cos(n \cdot x)$. The immediate consequences, proven by UAT, is that NNs densely cover the space of continuous functions, in the supremum norm, due to the freedom in the weights. Additionally, note that the number of degrees of freedom scales as $h \times m$, while in the Fourier theorem, this number scales as $N^m$.
 
-Extensions to UAT were proven for more general versions of single-layer NNs and also for deep NNs \cite{hornik1991}. This collection of results theoretically supports the use of NNs for machine learning, but they do not justify \textit{in practice} their widespread implementation for solving many different kind of problems. The usage is usually motivated by continuous good performance on the considered models on almost any task. 
+Extensions to UAT were proven for more general versions of single-layer NNs and also for deep NNs \cite{hornik1991approximation}. This collection of results theoretically supports the use of NNs for machine learning, but they do not justify \textit{in practice} their widespread implementation for solving many different kind of problems. The usage is usually motivated by continuous good performance on the considered models on almost any task. 
 
 \subsection{Training of neural networks: backpropagation}
 
@@ -331,13 +334,13 @@ for $D(\cdot, \cdot)$ being a distance, for example the mean squared error. We a
 \end{align}
 where the subindex $x$ states the loss function evaluated in one data point. Aside from a small weight given by the distance function, the most relevant part is given by the derivatives of the NN with respect to the internal parameters. For the last layer, we can immediately compute the derivatives as $\delta_L$. This quantity can be used to \textit{backpropagate} the effect of training data on the derivatives with respect to the biases as
 \begin{align}
-\frac{\partial y_{\rm NN}(x)}{\partial b_L} = \sigma^\prime \odot \frac{\partial y(x)}{\partial \sigma_L} \frac{\partial D(y(x), f_{\rm NN}(x)}{\partial y(x)} \\
-\frac{\partial y_{\rm NN}(x)}{\partial b_{l - 1}} = \sigma_{l - 1}^\prime \odot (W_l)^T \frac{\partial y_{\rm NN}(x)}{\partial b_l}, 
+\frac{\partial f_{\rm NN}(x)}{\partial b_L} = \sigma^\prime \odot \frac{\partial f_{\rm NN}(x)}{\partial \sigma_L} \frac{\partial D(y(x), f_{\rm NN}(x)}{\partial y(x)} \\
+\frac{\partial f_{\rm NN}(x)}{\partial b_{l - 1}} = \sigma_{l - 1}^\prime \odot (W_l)^T \frac{\partial f_{\rm NN}(x)}{\partial b_l}, 
 \end{align}
 with $\odot$ being a elementwise multiplication.
 The corresponding derivatives with respect to weights is just given by
 \begin{equation}
-\frac{\partial y_{\rm NN}(x)}{\partial W_l} = \frac{\partial y_{\rm NN}(x)}{\partial b_l} \left(\sigma_{l - 1}\right)^T,
+\frac{\partial f_{\rm NN}(x)}{\partial W_l} = \frac{\partial f_{\rm NN}(x)}{\partial b_l} \left(\sigma_{l - 1}\right)^T,
 \end{equation}
 with $\sigma_l(x)$ being the output of the $l$-th layer of the NN. 
 
@@ -351,7 +354,7 @@ Backpropagation is usually combined with stochastic gradient descent (SGD). This
 
 There exist many different models on neural networks in the literature, that have been proposed and developed with the goal of efficiently addressing some particular problems. In this chapter we give an overview of them, with no aim to be exhaustive. 
 
-\subsection{Activation functions}
+\subsubsection{Activation functions}
 
 In practice, NNs can work with almost any kind of activation function that one can imagine. However, some examples have been more extensively used than other. 
 
@@ -386,7 +389,7 @@ with does fulfill the sigmoid conditions.
 There is a more relevant reason to use ReLU functions, derived from the vanishing gradients problems. Recalling back propagation, it is noticeable that the size of the derivatives scales as $(\sigma^\prime)^L$, for fixed values of the weights. Hence, if $\sigma^\prime \vert \leq 1$, the derivatives on the first layers are suppressed as compared to the last layers. In particular, the sigmoid function previously defined has derivatives close to zero in most of its domain, with the exception of the region around $x = 0$. By applying the ReLU function, these derivatives are constanly 1, avoiding the vanishing gradients problems. 
 
 
-\subsection{Exotic neural networks}
+\subsubsection{Exotic neural networks}
 
 The NN previously explained is known as feedforward fully connected NN, and has all the relevant properties that make NNs unique. However, there exist many more examples of NNs. 
 
@@ -437,7 +440,7 @@ An interesting subclass of Boltzmann machines are restricted Boltzmann machines,
 \includegraphics[width = .45\linewidth]{images/restricted boltzmann}
 \end{figure}
 
-\subsection{Layers}
+\subsubsection{Layers}
 
 The previously mentioned networks and activation functions can, in principle, be combined at will to generate customizable neural networks tailored made for specific purposes. Those can also be combined with generic layers with particular effects. 
 
@@ -454,7 +457,7 @@ The DropOut layer randomly transforms features of the input to zero, or some oth
 
 \subsection{Creating our own neural network}
 
-For this section, I refer the reader to the Jupyter Notebook available here \href{}{here}.
+For this section, I refer the reader to the Jupyter Notebook available \href{}{here}.
 
 \subsection{Final remarks}
 
@@ -537,12 +540,6 @@ Optimally, the soft-margin SVM will behave as a hard-margin classifier, provided
 \subsection{Kernel trick}
 SVMs are optimal classifiers to find linear separations between classes. However, these methods are not capable of performing any non-linear separations. The kernel trick suffices to incorporate this capability into the SVM framework.
 
-\begin{figure}
-\centering
-\includegraphics[width = .8\linewidth]{images/kernel trick}
-\caption{Description of the kernel trick for the classification of a non-linearly-separable dataset. }
-\label{fig.kernel_trick}
-\end{figure}
 
 Consider the following classification problem. For $x \in \mathbb R^m$, the class is defined as
 \begin{equation}
@@ -556,6 +553,14 @@ k(x_i, x_j) = \varphi(x_i) \cdot \varphi(x_j).
 \end{equation}
 
 If this kernel is input to the dual optimization problem, it is immediate to observe that the kernel trick allows to perform linear classification in the space induced by the kernel, which does not need to be linear. 
+
+\begin{figure}
+\centering
+\includegraphics[width = .8\linewidth]{images/kernel trick}
+\caption{Description of the kernel trick for the classification of a non-linearly-separable dataset. }
+\label{fig.kernel_trick}
+\end{figure}
+
 
 There exist several kernels that are commonly used to perform classification tasks, such as
 
@@ -671,7 +676,7 @@ This code performs the following steps
 \item Generate a model composed by the following layers 
 \begin{enumerate}
 \item A \textit{flatten} layer, to transform a square image into a 1-dimensional array
-\item A dense fully connected layer, as in \Cref{sec.neural-networks-what}
+\item A dense fully connected layer, as in \Cref{sec.neural-networks}
 \item A dropout layer with probability 0.2 to drop (transform to zero)
 \item A second fully connecter layer with output 10, which is the number of classes required.
 \end{enumerate}
@@ -734,11 +739,11 @@ y_pred = np.argmax(model.predict(X_test), axis = 1)
 \end{boxedverbatim}
 \vskip5mm
 
-is capable of returning a prediction accuracy of $97,34\%$ within a training time of 30 seconds in a laptop. The prediction can be seen in \Cref{fig.mnist-prediction}. 
+is capable of returning a prediction accuracy of $97,34\%$ within a training time of 30 seconds in a laptop. The prediction can be seen in \Cref{fig.mnist}. 
 
 \begin{figure}\centering
 \includegraphics[width = .475\linewidth]{images/mnist}
-\includegraphics[width = .475\linewidth]{images/prediction-mnist}
+\includegraphics[width = .485\linewidth]{images/prediction-mnist}
 \caption{The MNIST dataset of handwritten digits (left) and its predicted classification using a simple \texttt{TensorFlow} neural network.}
 \label{fig.mnist}
 \end{figure}
@@ -834,7 +839,7 @@ test_errors = model.evaluate(X_test,y_test,verbose=0)[1]
 \end{boxedverbatim}
 \vskip5mm
 
-\section{Generative modeling with TensorFlow}
+\section{Generative modeling with TensorFlow}\label{sec.generative-tensorflow}
 
 Generative modelling is more complicated than just classification. In this example we will use adversarial training to construct a generative algorithm. 
 
@@ -914,7 +919,7 @@ Dequantization is conceptually related but different from simulability of quantu
 
 \paragraph{The power of (quantum) data --}
 
-This chapter will cover some examples and basic concdpts of quantum machine learning, together with examples of the problems in a computer. I will use {\tt QIBO} and {\tt Qiskit} for it.  
+This chapter will cover some examples and basic concdpts of quantum machine learning, together with examples of the problems in a computer. I will use {\tt QIBO} for it.  
 
 \section{Kernels in quantum machine learning}
 
@@ -928,8 +933,8 @@ k(x_i, x_j) = \vert \braket{\phi(x_i)}{\psi(x_j)} \vert^2 = \vert \bra 0 V^\dagg
 \end{equation}
 From this point on, applying QML is equivalent to using a SVM to solve a learning problem, with the modification that the new kernel cannot be (in principle) computed using classical resources. 
 
-For an illustrative example, consider this example in \Cref{fig.havlicek} \cite{havlicek2019supervised}. The depicted feature map transforms $x \in \mathbb R^2$ into a real number $y \in [-1, 1]$. The goal is to find the sign of $y$. By applying the kernel trick from SVM with this kernel, we can classify this data. 
-Generating this data using classical resources is hard because the considered circuit has properties to avoid classical simulability \footnote{Upon scaling in qubits and specific circuit architectures}. Notice however that the role of the quantum computer is not to learn the classification, but to transport the data into a linear subspace where classification is doable with linear separations. 
+For an illustrative example, consider this example in \Cref{fig.havlicek-kernel} \cite{havlicek2019supervised}. The depicted feature map transforms $x \in \mathbb R^2$ into a real number $y \in [-1, 1]$. The goal is to find the sign of $y$. By applying the kernel trick from SVM with this kernel, we can classify this data. 
+Generating this data using classical resources is hard because the considered circuit has properties to avoid classical simulability\footnote{Upon scaling in qubits and specific circuit architectures}. Notice however that the role of the quantum computer is not to learn the classification, but to transport the data into a linear subspace where classification is doable with linear separations. 
 
 \begin{figure}
 \centering
@@ -981,7 +986,7 @@ The key element of this problem is that the kernel is efficient to apply only fo
 
 \section{Variational quantum machine learning}\label{sec.variational}
 
-Variational quantum computing witnessed a large growth in the last decade, from its inception \cite{peruzzo2014variational}. Variational methods consist in applying parameter-dependent quantum circuits $U(\theta)$. These circuits can help with solving current hardware limitations in state-of-the art prototypes, including but not limited to available number of qubits, tolerance to error or number of operations. For comprehensive reviews, see \cite{bharti2021noisy, cerezo2021variational}
+Variational quantum computing witnessed a large growth in the last decade, from its inception \cite{peruzzo2014variational}. Variational methods consist in applying parameter-dependent quantum circuits $U(\theta)$. These circuits can help with solving current hardware limitations in state-of-the art prototypes, including but not limited to available number of qubits, tolerance to error or number of operations. For comprehensive reviews, see \cite{bharti2022noisy, cerezo2021variational}
 
 The functioning principle of a variational quantum algorithm is as follows. An ansatz of the form $\ket{\psi(\theta)} = U(\theta)\ket 0$ is used to generate a quantum state encoding the solution of a problem of interest. The problem itself is encoded in a Hamiltonian $H$. Solving the problem of interest becomes equivalent to finding the ground state of this Hamiltonian, and the optimal parameters are given by
 \begin{equation}
@@ -1014,7 +1019,7 @@ It is possible to show that the function generated by
 \begin{equation}
 h_\theta(x) \equiv \bra 0 U^\dagger(x, \theta) H U(x, \theta) \ket 0 
 \end{equation}
-satisfy universality theorems in a similar way as in \Cref{sec.neural-networks-universality}, even for single qubit quantum circuits. This provides a \textit{theoretical} capability of these parameter-dependent kernels to solve any kind of learning problems. The interpretation of re-uploading kernels is available in \Cref{fig.berta}. It has been recently shown that re-uploading schemes, used for quantum data, can also provide universality in the achieved functions \cite{perez-salinas2024universal}, with $\log d$ qubits, being $d$ the dimensionality of the data. 
+satisfy universality theorems in a similar way as in \Cref{sec.universality-nn}, even for single qubit quantum circuits. This provides a \textit{theoretical} capability of these parameter-dependent kernels to solve any kind of learning problems. The interpretation of re-uploading kernels is available in \Cref{fig.berta}. It has been recently shown that re-uploading schemes, used for quantum data, can also provide universality in the achieved functions \cite{perez-salinas2024universal}, with $\log d$ qubits, being $d$ the dimensionality of the data. 
 
 \begin{figure}\centering
 \includegraphics[width = .7\linewidth]{images/reuploading}
