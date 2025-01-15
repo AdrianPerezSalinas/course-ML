@@ -236,7 +236,6 @@ class SupportVectorMachineDual:
         A = 
         b = 
         
-        solvers.options['show_progress'] = False
         solution = solvers.qp(P, q, G, h, A, b)
         self.alpha = np.ravel(solution['x'])
         

@@ -152,7 +152,7 @@ Supervised classification is a paradigmatic example of machine learning. In many
 
 Supervised classification can be seen as a particular case of regression, restricting the data function to the form
 \begin{equation}
-y: \mathbb R^nm \rightarrow \mathbb Z. 
+y: \mathbb R^n \rightarrow \mathbb Z. 
 \end{equation}
 One can map the data functions from regression $(y_r)$ to classification $(y_c)$ as follows. Consider the image of $y_r$ being $\mathbb R$. Then, an integer rounding of the output would be enough to perform classification. Alternatively, if the image is $[0, 1]^C \in \mathbb R^C$, the classification can be performed by considering $y_r$ as a step function, doable by rounding functions. 
 
@@ -413,7 +413,13 @@ These NNs are particularly useful to process data in the form of images, since t
 
 Autoencoders can be used mainly in two tasks. First, one can consider large data to be compressed into a more simple representation. Since the simple representation is assumed to have the same information as raw data, it can be used as an input to another network to solve a learning problem. The cost of the network is reduced in this way. Second, one can generate data by inputing data in the compressed format to the decoder, creating a generative model. 
 
-\paragraph{Hopfield network --} \alert{TO DO} This network is a form of recurrent NN inspired by physics, in particular by spin glass systems. The Hopfield NN can be interpreted as a network in which neurons interact with each other, rather than acting on the input and feedforward it to the next layer. The Hopfield network provides memory, that is, its internal configuration evolves towards a ground state energy that stores patterns on training. 
+\paragraph{Hopfield network --} This network is a form of recurrent NN inspired by physics, in particular by spin glass systems. The Hopfield NN can be interpreted as a network in which neurons interact with each other, rather than acting on the input and feedforward it to the next layer. The Hopfield network provides memory, that is, its internal configuration evolves towards a ground state energy that stores patterns on training. 
+
+The Hopfield network is designed by
+\begin{equation}
+y_i = \operatorname{sign}\left(\sum_j w_{ij} x_j - b_i\right), 
+\end{equation}
+and they are designed to store information. If $x$ is a corrupted state or a partial description of it, the Hopfield network will recover the memorized state. Convergence is not guaranteed. 
 
 Hopfield won the Nobel prize in Physics in 2024.
 
@@ -494,7 +500,7 @@ For hard-margin classifiers, the data must be linearly separable, and by assumpt
 \end{equation}
 In the case of soft-margin classifiers, the goal is to minimize the loss function
 \begin{equation}
-C_{\mathcal T}(w, b) = - \frac{1}{\mathcal T}\sum_{x \in \mathcal T} y(x) \left(w \cdot x - b \right).
+C_{\mathcal T}(w, b) = - \frac{1}{\mathcal T}\sum_{x \in \mathcal T} \max\left(0, y(x) \left(w \cdot x - b \right)\right).
 \end{equation}
 It is common practice to add a regularization term on $\Vert w \Vert$, yielding
 \begin{equation}
@@ -632,6 +638,23 @@ The ROC (Receiver Operating Characteristic) is a curve that compares the ratio o
 \label{fig.roc}
 \end{figure}
 
+\subsection{Common gradient-descent optimizers -- ADAM}
+
+The ADAM optimizer \cite{kingma2017adam} is one of the most common gradient descent optimizers, widely used in machine learning and neural networks. In words of the authors 
+\begin{quote}
+The method is straightforward to implement, is computationally efficient,
+has little memory requirements, is invariant to diagonal rescaling of the gradients,
+and is well suited for problems that are large in terms of data and/or parameters.
+The method is also appropriate for non-stationary objectives and problems with
+very noisy and/or sparse gradients.
+\end{quote}
+
+\begin{figure}
+\centering
+\includegraphics[width = \linewidth]{images/adam}
+\end{figure}
+
+The ADAM optimizer is based on averages of gradients, given to the first and second order, by $m_t$ and $v_t$ respectively in the code. During the first timesteps, the algorithm provides large variabilty in these averages, while as the iteration number grows they converge to a stationary point. This is achieved by controlling the hyperparameters $\alpha, \beta_1, \beta_2$, which make the influence of each new step decay in each new iterations. 
 
 \chapter{Introduction to TensorFlow}\label{sec.tensorflow}
 
@@ -848,7 +871,7 @@ Adversarial training is composed by two elements: the generator and the discrimi
 \mathcal L_{\rm Gen} & = -\frac{1}{\vert \mathcal T_{\rm Gen} \vert}\sum_{x \in \mathcal T_{\rm gen}} D(x)\\
 \mathcal L_{\rm Disc} & = \frac{1}{\vert \mathcal T_{\rm Gen} \vert}\sum_{x \in \mathcal T_{\rm gen}} D(x) - \frac{1}{\vert \mathcal T_{\rm Real} \vert}\sum_{x \in \mathcal T_{\rm Real}} D(x)
 \end{align}
-which compete. In our case, use the cross-entropy between two probability distributions, but any other can be in principle used. Since both the generator and the discriminator are neural networks, one can use the backpropagation trick to compute gradients and update the network, allowing for an efficient training process. 
+which compete. In our case, use the cross-entropy between two probability distributions, but any other can be in principle used. Since both the generator and the discriminator are neural networks, one can use the backpropagation trick to compute gradients and update the network, allowing for an efficient training process. From this point, it is possible to choose an optimizer that completes the work for us. The optimizer just applies gradient-descent-like algorithms. 
 
 
  [TO BE COMPLETED]
